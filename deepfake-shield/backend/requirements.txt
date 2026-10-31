@@ -23,5 +23,5 @@ soundfile>=0.12.1
 c2pa-python>=0.6.0
 imagehash>=4.3.1
 
-# Desktop GUI Application
-PyQt6>=6.5.0
+# Desktop GUI Application (local only — not installed on Render)
+# PyQt6>=6.5.0

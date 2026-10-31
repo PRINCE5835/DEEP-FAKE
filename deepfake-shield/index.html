@@ -491,42 +491,6 @@
             display: none !important;
         }
 
-        /* Process Reference Grid */
-        .process-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .process-card {
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .process-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .process-title {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--brand-navy);
-            margin-bottom: 4px;
-        }
-
-        .process-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
         /* Printable Forensic Certificate */
         @media print {
             body {
@@ -584,35 +548,6 @@
                 <button class="btn-preset" onclick="loadDeepfakeVideoPreset()">🎥 AI Deepfake Video</button>
                 <button class="btn-preset" onclick="loadAudioPreset()">🎙️ ElevenLabs Voice Clone</button>
                 <button class="btn-preset" onclick="loadViralClaimPreset()">📰 Disinformation Claim</button>
-            </div>
-        </div>
-
-        <!-- Process Reference: What DEEP-SHIELD Detects -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title font-serif">Forensic Process Reference</div>
-            </div>
-            <div class="process-grid">
-                <div class="process-card">
-                    <div class="process-icon">👁️</div>
-                    <div class="process-title">Image Analysis</div>
-                    <div class="process-desc">ViT classifier + Grad-CAM heatmaps + Error Level Analysis (ELA) for splicing detection.</div>
-                </div>
-                <div class="process-card">
-                    <div class="process-icon">🎙️</div>
-                    <div class="process-title">Audio Analysis</div>
-                    <div class="process-desc">Wav2Vec classifier + vocoder cutoff detection + F0 micro-jitter + mel-spectrogram gating.</div>
-                </div>
-                <div class="process-card">
-                    <div class="process-icon">🎥</div>
-                    <div class="process-title">Video Analysis</div>
-                    <div class="process-desc">Temporal consistency + blink rate (EAR) + optical flow + per-frame image forensics.</div>
-                </div>
-                <div class="process-card">
-                    <div class="process-icon">📰</div>
-                    <div class="process-title">Text Analysis</div>
-                    <div class="process-desc">Google FactCheck API + offline stylometrics (burstiness, TTR, LLM transitions).</div>
-                </div>
             </div>
         </div>
 
@@ -717,7 +652,7 @@
     </main>
 
     <script>
-        const API_BASE = "http://127.0.0.1:8000/api/v1";
+        const API_BASE = "/api/v1";
 
         let currentModality = 'image';
         let currentPayload = null;

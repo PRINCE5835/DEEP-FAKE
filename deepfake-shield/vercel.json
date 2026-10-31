@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "name": "deepfake-shield",
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://deepfake-shield-backend.onrender.com/api/v1/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://deepfake-shield-backend.onrender.com/api/:path*"
+    }
+  ]
+}

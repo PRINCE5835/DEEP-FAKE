@@ -6,13 +6,15 @@ from app.forensics.audio import analyze_audio
 from app.forensics.video import analyze_video
 from app.forensics.text_checker import verify_text_claim
 from app.forensics.reverse_image_search import reverse_image_search
+import os
 
 app = FastAPI(title="DEEP-SHIELD API", version="2.0.0")
 
 # CORS middleware for Web Dashboard & Chrome Extension
+cors_origins = os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[o.strip() for o in cors_origins],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

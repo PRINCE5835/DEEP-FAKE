@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: deepfake-shield-backend
+    env: python
+    rootDir: deepfake-shield/backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: CORS_ORIGINS
+        value: "https://deepfake-shield.vercel.app"
+      - key: GOOGLE_FACTCHECK_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: LOG_LEVEL
+        value: "INFO"
