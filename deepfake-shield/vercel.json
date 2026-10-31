@@ -1,18 +1,4 @@
 {
   "version": 2,
-  "name": "deepfake-shield",
-  "rewrites": [
-    {
-      "source": "/api/v1/(.*)",
-      "destination": "https://deep-fake-2-de8a.onrender.com/api/v1/$1"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "https://deep-fake-2-de8a.onrender.com/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "name": "deepfake-shield"
 }
