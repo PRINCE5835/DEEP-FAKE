@@ -3,12 +3,16 @@
   "name": "deepfake-shield",
   "rewrites": [
     {
-      "source": "/api/v1/:path*",
-      "destination": "https://deep-fake-2-de8a.onrender.com/api/v1/:path*"
+      "source": "/api/v1/(.*)",
+      "destination": "https://deep-fake-2-de8a.onrender.com/api/v1/$1"
     },
     {
-      "source": "/api/:path*",
-      "destination": "https://deep-fake-2-de8a.onrender.com/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://deep-fake-2-de8a.onrender.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
