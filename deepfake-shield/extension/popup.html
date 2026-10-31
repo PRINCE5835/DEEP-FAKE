@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Deepfake Shield</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo-title">
+      <span class="shield-icon">🛡️</span>
+      <h2>Deepfake Shield</h2>
+    </div>
+    <span class="tag">Multi-Modal</span>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-image">Image</button>
+    <button class="tab-btn" id="tab-video">Video</button>
+    <button class="tab-btn" id="tab-audio">Audio</button>
+    <button class="tab-btn" id="tab-text">Claim</button>
+  </div>
+
+  <!-- Shared File Drop Area for Media -->
+  <div id="media-panel" class="panel active">
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="media-file-input" hidden />
+      <span class="upload-icon" id="media-icon">🖼️</span>
+      <p id="drop-prompt">Upload an image file</p>
+      <span class="file-name" id="file-name"></span>
+    </div>
+    <button id="analyze-media-btn" class="action-btn" disabled>Scan Media</button>
+  </div>
+
+  <!-- Text / Claim Analysis -->
+  <div id="text-panel" class="panel">
+    <textarea id="claim-text" placeholder="Paste forwarded news, tweet, or WhatsApp claim..."></textarea>
+    <button id="analyze-text-btn" class="action-btn">Verify Claim</button>
+  </div>
+
+  <!-- Result Container -->
+  <div id="result-box" class="result-box hidden">
+    <div class="verdict-banner">
+      <span id="verdict-title">ANALYZING...</span>
+      <span id="verdict-confidence"></span>
+    </div>
+    <p id="plain-explanation" class="explanation-text"></p>
+    <div id="source-links" class="source-links hidden"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

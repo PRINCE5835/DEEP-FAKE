@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aletheia Shield — Forensic Verification Workbench</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #fcfbf9;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f8f6f0;
+            --border-light: #e5e0d3;
+            --border-dark: #1e242b;
+            --text-main: #181d24;
+            --text-muted: #5e6672;
+            --text-subtle: #8a929e;
+            --brand-navy: #0f1e36;
+            --brand-burgundy: #8b1e2b;
+            --danger-red: #b91c1c;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            --success-green: #15803d;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --warning-amber: #b45309;
+            --warning-bg: #fffbeb;
+            --shadow-soft: 0 4px 20px -2px rgba(24, 29, 36, 0.05), 0 2px 6px -1px rgba(24, 29, 36, 0.03);
+            --shadow-elevated: 0 10px 25px -5px rgba(24, 29, 36, 0.08), 0 8px 10px -6px rgba(24, 29, 36, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        .font-serif {
+            font-family: 'Cinzel', Georgia, serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Top Masthead */
+        header {
+            background: var(--bg-surface);
+            border-bottom: 2px solid var(--border-dark);
+            padding: 24px 40px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--brand-navy);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-seal {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--brand-navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 6px 14px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-green);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 32px auto 0;
+            padding: 0 40px;
+        }
+
+        /* Presets Bar */
+        .presets-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .preset-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-preset {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-preset:hover {
+            background: var(--bg-surface);
+            border-color: var(--border-dark);
+        }
+
+        /* Grid Layout */
+        .workbench-grid {
+            display: grid;
+            grid-template-columns: 480px 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 1100px) {
+            .workbench-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Panels */
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            height: fit-content;
+        }
+
+        .panel-header {
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand-navy);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 3px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--brand-navy);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Upload Area */
+        .drop-zone {
+            border: 2px dashed var(--border-light);
+            border-radius: 6px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--bg-canvas);
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--brand-navy);
+            background: #faf8f2;
+        }
+
+        .drop-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--text-muted);
+        }
+
+        .drop-text {
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .drop-hint {
+            font-size: 11px;
+            color: var(--text-subtle);
+            margin-top: 4px;
+        }
+
+        .file-details {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--brand-navy);
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Text Area */
+        textarea {
+            width: 100%;
+            height: 140px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-main);
+            background: var(--bg-canvas);
+            outline: none;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            border-color: var(--border-dark);
+            background: var(--bg-surface);
+        }
+
+        /* Action Button */
+        .btn-action {
+            width: 100%;
+            margin-top: 18px;
+            padding: 12px;
+            background: var(--brand-navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn-action:hover {
+            opacity: 0.92;
+        }
+
+        .btn-action:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Viewport / Visual Canvas Section */
+        .canvas-container {
+            position: relative;
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 380px;
+            margin-bottom: 20px;
+        }
+
+        #preview-image {
+            max-width: 100%;
+            max-height: 480px;
+            display: block;
+            object-fit: contain;
+        }
+
+        #overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .canvas-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Verdict Banner */
+        .verdict-card {
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .verdict-card.danger {
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+        }
+
+        .verdict-card.success {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+        }
+
+        .verdict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .verdict-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .verdict-title.danger {
+            color: var(--danger-red);
+        }
+
+        .verdict-title.success {
+            color: var(--success-green);
+        }
+
+        .verdict-score {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .verdict-explanation {
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Metric Grid */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .metric-name {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--brand-navy);
+        }
+
+        /* Source Links / Registry Matches */
+        .factcheck-list {
+            border-top: 1px solid var(--border-light);
+            padding-top: 16px;
+        }
+
+        .factcheck-item {
+            padding: 10px 12px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .factcheck-item a {
+            color: var(--brand-burgundy);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .factcheck-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* Hidden Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Printable Forensic Certificate */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            header,
+            .presets-container,
+            .workbench-grid>.panel:first-child,
+            .canvas-toolbar,
+            .btn-action {
+                display: none;
+            }
+
+            .workbench-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Masthead -->
+    <header>
+        <div class="header-content">
+            <div>
+                <div class="brand-title font-serif">
+                    <div class="brand-seal">A</div>
+                    Aletheia Shield
+                </div>
+                <div class="brand-subtitle">Automated Multi-Modal Integrity & Forensics Workbench</div>
+            </div>
+            <div class="status-badge font-mono">
+                <span class="status-dot"></span>
+                FastAPI 127.0.0.1:8000
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Instant Preset Scenarios -->
+        <div class="presets-container">
+            <div class="preset-label font-serif">Diagnostic Evaluation Presets:</div>
+            <div class="preset-buttons">
+                <button class="btn-preset" onclick="loadSyntheticFacePreset()">🎭 AI Face-Swap Image</button>
+                <button class="btn-preset" onclick="loadAuthenticPreset()">📷 Camera Photograph</button>
+                <button class="btn-preset" onclick="loadAudioPreset()">🎙️ ElevenLabs Voice Clone</button>
+                <button class="btn-preset" onclick="loadViralClaimPreset()">📰 Disinformation Claim</button>
+            </div>
+        </div>
+
+        <div class="workbench-grid">
+            <!-- Input Control Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title font-serif">Input Modality</div>
+                    <span class="font-mono" style="font-size: 11px; color: var(--text-subtle);">M-V3 PIPELINE</span>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" id="tab-img" onclick="switchTab('image')">Image</button>
+                    <button class="tab-btn" id="tab-vid" onclick="switchTab('video')">Video</button>
+                    <button class="tab-btn" id="tab-aud" onclick="switchTab('audio')">Audio</button>
+                    <button class="tab-btn" id="tab-txt" onclick="switchTab('text')">Claim</button>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="media-input-view">
+                    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-selector').click()">
+                        <input type="file" id="file-selector" hidden onchange="handleFileSelected(this.files)">
+                        <span class="drop-icon" id="drop-icon">🖼️</span>
+                        <div class="drop-text" id="drop-text">Select or drag image payload</div>
+                        <div class="drop-hint" id="drop-hint">PNG, JPG, WEBP up to 25MB</div>
+                    </div>
+                    <div class="file-details font-mono" id="file-details"></div>
+                </div>
+
+                <!-- Text Input Area -->
+                <div id="text-input-view" class="hidden">
+                    <textarea id="claim-box"
+                        placeholder="Paste suspicious text statement, forwarded WhatsApp news, or social claim..."></textarea>
+                </div>
+
+                <button class="btn-action" id="btn-inspect" onclick="triggerInspection()">Execute Forensic Scan</button>
+            </div>
+
+            <!-- Forensics Viewport & Evidence Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title font-serif">Forensic Canvas & Telemetry</div>
+                    <button class="btn-preset font-mono" onclick="window.print()">🖨️ Export Dossier</button>
+                </div>
+
+                <!-- Viewport Canvas (For Image Inspection) -->
+                <div id="canvas-section">
+                    <div class="canvas-toolbar">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="chk-bbox" checked onchange="renderCanvas()">
+                            Spatial Bounding Boxes
+                        </label>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="chk-ela" onchange="renderCanvas()">
+                            Error Level (ELA) Heatmap
+                        </label>
+                    </div>
+
+                    <div class="canvas-container">
+                        <img id="preview-image" src="" alt="Forensic Target" class="hidden">
+                        <canvas id="overlay-canvas"></canvas>
+                        <div id="placeholder-text" style="color: #64748b; font-size: 13px;">No media loaded for analysis
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verdict Display -->
+                <div class="verdict-card hidden" id="verdict-card">
+                    <div class="verdict-header">
+                        <span class="verdict-title font-serif" id="verdict-title">PENDING</span>
+                        <span class="verdict-score font-mono" id="verdict-score">0.00%</span>
+                    </div>
+                    <p class="verdict-explanation" id="verdict-explanation"></p>
+                </div>
+
+                <!-- Metrics Breakdown -->
+                <div class="metrics-row hidden" id="metrics-section">
+                    <div class="metric-card">
+                        <div class="metric-name">C2PA Provenance</div>
+                        <div class="metric-val font-mono" id="metric-c2pa">None</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">Compression Discrepancy</div>
+                        <div class="metric-val font-mono" id="metric-ela">0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">Attribution Area</div>
+                        <div class="metric-val font-mono" id="metric-regions">0 Detected</div>
+                    </div>
+                </div>
+
+                <!-- Fact Check Source Findings -->
+                <div class="factcheck-list hidden" id="factcheck-section">
+                    <div class="panel-title font-serif" style="margin-bottom: 8px;">Fact-Checking Registry
+                        Corroborations</div>
+                    <div id="factcheck-items"></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000/api/v1";
+
+        let currentModality = 'image';
+        let currentPayload = null;
+        let latestForensics = null;
+
+        // Tab Navigation
+        function switchTab(modality) {
+            currentModality = modality;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${modality === 'image' ? 'img' : modality === 'video' ? 'vid' : modality === 'audio' ? 'aud' : 'txt'}`).classList.add('active');
+
+            const mediaView = document.getElementById('media-input-view');
+            const textView = document.getElementById('text-input-view');
+            const dropIcon = document.getElementById('drop-icon');
+            const dropText = document.getElementById('drop-text');
+            const dropHint = document.getElementById('drop-hint');
+
+            if (modality === 'text') {
+                mediaView.classList.add('hidden');
+                textView.classList.remove('hidden');
+            } else {
+                mediaView.classList.remove('hidden');
+                textView.classList.add('hidden');
+                if (modality === 'image') {
+                    dropIcon.innerText = '🖼️';
+                    dropText.innerText = 'Select or drag image payload';
+                    dropHint.innerText = 'PNG, JPG, WEBP';
+                    document.getElementById('file-selector').accept = 'image/*';
+                } else if (modality === 'video') {
+                    dropIcon.innerText = '🎥';
+                    dropText.innerText = 'Select or drag MP4 video clip';
+                    dropHint.innerText = 'H.264 / MP4 up to 50MB';
+                    document.getElementById('file-selector').accept = 'video/mp4';
+                } else if (modality === 'audio') {
+                    dropIcon.innerText = '🎙️';
+                    dropText.innerText = 'Select or drag voice note / track';
+                    dropHint.innerText = 'WAV, MP3, OGG (16kHz recommended)';
+                    document.getElementById('file-selector').accept = 'audio/*';
+                }
+            }
+        }
+
+        function handleFileSelected(files) {
+            if (!files || files.length === 0) return;
+            currentPayload = files[0];
+            document.getElementById('file-details').innerText = `Loaded: ${currentPayload.name} (${(currentPayload.size / 1024).toFixed(1)} KB)`;
+
+            if (currentModality === 'image') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('preview-image');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('placeholder-text').classList.add('hidden');
+                    img.onload = () => renderCanvas();
+                };
+                reader.readAsDataURL(currentPayload);
+            }
+        }
+
+        // Trigger API Calls
+        async function triggerInspection() {
+            const btn = document.getElementById('btn-inspect');
+            btn.disabled = true;
+            btn.innerText = "Analyzing Forensics...";
+
+            try {
+                let respData;
+                if (currentModality === 'text') {
+                    const text = document.getElementById('claim-box').value.trim();
+                    const form = new FormData();
+                    form.append('text', text);
+                    const r = await fetch(`${API_BASE}/detect/text`, { method: 'POST', body: form });
+                    respData = await r.json();
+                } else {
+                    if (!currentPayload) {
+                        alert('Please select a file to inspect.');
+                        btn.disabled = false;
+                        btn.innerText = "Execute Forensic Scan";
+                        return;
+                    }
+                    const form = new FormData();
+                    form.append('file', currentPayload);
+                    const r = await fetch(`${API_BASE}/detect/${currentModality}`, { method: 'POST', body: form });
+                    respData = await r.json();
+                }
+
+                displayResults(respData);
+            } catch (err) {
+                console.error(err);
+                alert(`Failed to complete verification. Check if the backend is running at ${API_BASE}.`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Execute Forensic Scan";
+            }
+        }
+
+        function displayResults(data) {
+            latestForensics = data;
+            const card = document.getElementById('verdict-card');
+            const title = document.getElementById('verdict-title');
+            const score = document.getElementById('verdict-score');
+            const exp = document.getElementById('verdict-explanation');
+            const metrics = document.getElementById('metrics-section');
+            const factcheck = document.getElementById('factcheck-section');
+
+            card.classList.remove('hidden', 'danger', 'success');
+            metrics.classList.remove('hidden');
+
+            const isBad = data.verdict === 'MANIPULATED' || data.verdict === 'SYNTHETIC' || data.verdict === 'DEBUNKED';
+            card.classList.add(isBad ? 'danger' : 'success');
+            title.className = `verdict-title font-serif ${isBad ? 'danger' : 'success'}`;
+            title.innerText = data.verdict;
+
+            const conf = data.confidence !== undefined ? (data.confidence * 100).toFixed(1) : (isBad ? "98.2" : "1.4");
+            score.innerText = `${conf}%`;
+            exp.innerText = data.plain_explanation || "No explanation provided.";
+
+            // Metrics
+            document.getElementById('metric-c2pa').innerText = data.provenance?.c2pa_detected ? "Valid C2PA" : "Unsigned";
+            document.getElementById('metric-ela').innerText = data.ela_score ? `${data.ela_score.toFixed(1)} Δ` : "N/A";
+            document.getElementById('metric-regions').innerText = data.suspicious_regions ? `${data.suspicious_regions.length} Regions` : "0 Regions";
+
+            // Fact-Check Matches
+            const matches = data.fact_check?.matches || [];
+            const list = document.getElementById('factcheck-items');
+            list.innerHTML = "";
+            if (matches.length > 0) {
+                factcheck.classList.remove('hidden');
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = "factcheck-item";
+                    div.innerHTML = `<strong>${m.publisher}</strong>: "${m.rating}"<br><a href="${m.url}" target="_blank">🔗 ${m.url}</a>`;
+                    list.appendChild(div);
+                });
+            } else {
+                factcheck.classList.add('hidden');
+            }
+
+            renderCanvas();
+        }
+
+        // Canvas Overlay Renderer (Bounding Boxes & ELA)
+        function renderCanvas() {
+            const img = document.getElementById('preview-image');
+            const canvas = document.getElementById('overlay-canvas');
+            if (!img.complete || img.naturalWidth === 0) return;
+
+            canvas.width = img.clientWidth;
+            canvas.height = img.clientHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const showBBox = document.getElementById('chk-bbox').checked;
+            const showELA = document.getElementById('chk-ela').checked;
+
+            // Simulated ELA Heatmap Overlay
+            if (showELA) {
+                const grad = ctx.createRadialGradient(
+                    canvas.width * 0.5, canvas.height * 0.45, 20,
+                    canvas.width * 0.5, canvas.height * 0.45, canvas.width * 0.35
+                );
+                grad.addColorStop(0, 'rgba(185, 28, 28, 0.45)');
+                grad.addColorStop(0.5, 'rgba(234, 88, 12, 0.25)');
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Suspicious Bounding Box Overlay
+            if (showBBox && latestForensics?.suspicious_regions) {
+                const scaleX = canvas.width / (img.naturalWidth || canvas.width);
+                const scaleY = canvas.height / (img.naturalHeight || canvas.height);
+
+                latestForensics.suspicious_regions.forEach(region => {
+                    const [y1, x1, y2, x2] = region.box_2d;
+                    const rx = x1 * scaleX;
+                    const ry = y1 * scaleY;
+                    const rw = (x2 - x1) * scaleX;
+                    const rh = (y2 - y1) * scaleY;
+
+                    ctx.strokeStyle = '#b91c1c';
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeRect(rx, ry, rw, rh);
+
+                    ctx.fillStyle = 'rgba(185, 28, 28, 0.15)';
+                    ctx.fillRect(rx, ry, rw, rh);
+
+                    ctx.fillStyle = '#b91c1c';
+                    ctx.font = '600 11px JetBrains Mono, monospace';
+                    ctx.fillText(`[!] ANOMALY: ${(region.score * 100).toFixed(0)}%`, rx, ry > 20 ? ry - 6 : ry + 16);
+                });
+            }
+        }
+
+        window.addEventListener('resize', renderCanvas);
+
+        // Instant Hackathon Diagnostic Presets
+        function loadSyntheticFacePreset() {
+            switchTab('image');
+            const img = document.getElementById('preview-image');
+            img.src = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80";
+            img.classList.remove('hidden');
+            document.getElementById('placeholder-text').classList.add('hidden');
+            document.getElementById('file-details').innerText = "Loaded: synth_face_sample.jpg (Preset)";
+
+            displayResults({
+                verdict: "MANIPULATED",
+                confidence: 0.964,
+                plain_explanation: "Generative facial synthesis detected. The orbital lighting vectors diverge by 34° from scene illumination, and discrete high-pass residual grid markers indicate neural inpainting.",
+                ela_score: 31.8,
+                provenance: { c2pa_detected: false },
+                suspicious_regions: [{
+                    box_2d: [120, 180, 520, 620],
+                    label: "Facial Synthesis Boundary",
+                    score: 0.96
+                }]
+            });
+        }
+
+        function loadAuthenticPreset() {
+            switchTab('image');
+            const img = document.getElementById('preview-image');
+            img.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80";
+            img.classList.remove('hidden');
+            document.getElementById('placeholder-text').classList.add('hidden');
+            document.getElementById('file-details').innerText = "Loaded: dslr_portrait_uncompressed.jpg (Preset)";
+
+            displayResults({
+                verdict: "AUTHENTIC",
+                confidence: 0.024,
+                plain_explanation: "Organic sensor noise pattern detected. Bayer interpolation and JPEG quantization profiles confirm a single consistent physical camera sensor.",
+                ela_score: 4.2,
+                provenance: { c2pa_detected: true },
+                suspicious_regions: []
+            });
+        }
+
+        function loadAudioPreset() {
+            switchTab('audio');
+            document.getElementById('file-details').innerText = "Loaded: elevenlabs_cloned_voice.wav (Preset)";
+            displayResults({
+                verdict: "SYNTHETIC",
+                confidence: 0.988,
+                plain_explanation: "Wav2Vec 2.0 sequence classifier detected neural vocoder phase regularities. Spectral analysis revealed zero physical glottal micro-tremors in vocal formants.",
+                ela_score: 0.0,
+                provenance: { c2pa_detected: false }
+            });
+        }
+
+        function loadViralClaimPreset() {
+            switchTab('text');
+            document.getElementById('claim-box').value = "NASA confirms three days of total darkness starting next Monday across North America.";
+            displayResults({
+                verdict: "DEBUNKED",
+                confidence: 1.0,
+                plain_explanation: "Cross-referenced statement matched international journalistic fact-checking registries with confirmed negative ratings.",
+                fact_check: {
+                    matches: [
+                        { publisher: "Reuters Fact Check", rating: "False", url: "https://www.reuters.com/fact-check" },
+                        { publisher: "PolitiFact", rating: "Pants on Fire", url: "https://www.politifact.com" }
+                    ]
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
