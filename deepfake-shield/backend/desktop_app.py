@@ -48,7 +48,7 @@ class ForensicWorker(QThread):
 class DeepfakeShieldApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Deepfake & Misinformation Shield - Forensic Suite")
+        self.setWindowTitle("DEEP-SHIELD - Forensic Suite")
         self.resize(1000, 720)
         self.selected_image_path = None
         self.selected_audio_path = None
@@ -87,7 +87,7 @@ class DeepfakeShieldApp(QMainWindow):
         main_layout = QVBoxLayout()
 
         # Header Title Banner
-        header = QLabel("🛡️ Deepfake & Misinformation Shield — Multimodal Verifier")
+        header = QLabel("🛡️ DEEP-SHIELD — Multimodal Verifier")
         header.setFont(QFont("Segoe UI", 16, QFont.Weight.Bold))
         header.setStyleSheet("color: #38bdf8; margin-bottom: 8px;")
         main_layout.addWidget(header)
@@ -297,7 +297,7 @@ class DeepfakeShieldApp(QMainWindow):
     def render_image_result(self, data):
         verdict = data.get("verdict", "UNKNOWN")
         conf = data.get("confidence", 0.0)
-        is_bad = verdict in ["MANIPULATED", "SYNTHETIC"]
+        is_bad = verdict in ["MANIPULATED", "SYNTHETIC", "DEBUNKED", "SUSPECT_AI"]
 
         self.img_result_pane.badge.setText(f"VERDICT: {verdict} ({conf*100:.1f}%)")
         self.img_result_pane.badge.setStyleSheet(f"color: {'#ef4444' if is_bad else '#10b981'};")
@@ -334,7 +334,7 @@ class DeepfakeShieldApp(QMainWindow):
     def render_generic_result(self, pane, data):
         verdict = data.get("verdict", "UNKNOWN")
         conf = data.get("confidence", 0.0)
-        is_bad = verdict in ["MANIPULATED", "SYNTHETIC"]
+        is_bad = verdict in ["MANIPULATED", "SYNTHETIC", "DEBUNKED", "SUSPECT_AI"]
 
         pane.badge.setText(f"VERDICT: {verdict} ({conf*100:.1f}%)")
         pane.badge.setStyleSheet(f"color: {'#ef4444' if is_bad else '#10b981'};")

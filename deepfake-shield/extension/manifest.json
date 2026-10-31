@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Deepfake Shield",
+  "name": "DEEP-SHIELD",
   "version": "2.0.0",
   "description": "Instant in-situ detection of deepfakes, voice cloning, and forwarded misinformation.",
   "permissions": [

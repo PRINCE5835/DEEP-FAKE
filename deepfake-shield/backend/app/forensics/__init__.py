@@ -33,6 +33,13 @@ except ImportError:
     verify_text_claim = None  # type: ignore
     analyze_text_forensics = None  # type: ignore
 
+try:
+    from .reverse_image_search import reverse_image_search
+    analyze_reverse_image_search = reverse_image_search
+except ImportError:
+    reverse_image_search = None  # type: ignore
+    analyze_reverse_image_search = None  # type: ignore
+
 __all__ = [
     "inspect_c2pa",
     "extract_c2pa_provenance",
@@ -42,4 +49,6 @@ __all__ = [
     "analyze_audio_forensics",
     "verify_text_claim",
     "analyze_text_forensics",
+    "reverse_image_search",
+    "analyze_reverse_image_search",
 ]

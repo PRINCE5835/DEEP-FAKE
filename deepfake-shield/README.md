@@ -1,11 +1,11 @@
-# 🛡️ Deepfake Shield — Multimodal AI Forensic Defense Suite
+# 🛡️ DEEP-SHIELD — Multimodal AI Forensic Defense Suite
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Chrome MV3](https://img.shields.io/badge/Chrome_Extension-Manifest_V3-4285F4.svg?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/mv3/)
 [![C2PA](https://img.shields.io/badge/Standard-C2PA_%2F_CAI-blue.svg)](https://c2pa.org/)
 [![PyTorch](https://img.shields.io/badge/Deep_Learning-PyTorch_%26_Wav2Vec_2.0-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
 
-**Deepfake Shield** is a multimodal AI forensic system and browser extension designed to protect internet users from synthetic media deception in real-time. It detects deepfake images, cloned audio, AI-generated disinformation, and extracts cryptographically signed C2PA provenance manifests directly *in-situ* on any webpage (Twitter/X, Facebook, YouTube, Reddit, news portals).
+**DEEP-SHIELD** is a multimodal AI forensic system and browser extension designed to protect internet users from synthetic media deception in real-time. It detects deepfake images, cloned audio, AI-generated disinformation, and extracts cryptographically signed C2PA provenance manifests directly *in-situ* on any webpage (Twitter/X, Facebook, YouTube, Reddit, news portals).
 
 ---
 
@@ -84,7 +84,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 2. Enable **Developer mode** (toggle switch in the top-right corner).
 3. Click **Load unpacked**.
 4. Select the `deepfake-shield/extension` folder.
-5. The 🛡️ **Deepfake Shield** extension is now active!
+5. The 🛡️ **DEEP-SHIELD** extension is now active!
 
 ---
 
@@ -92,14 +92,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### Method A: Right-Click In-Situ Inspection (Browsing the Web)
 1. Right-click on any image, video, audio clip, or highlighted text on any webpage.
-2. Select **🛡️ Deepfake Shield** from the context menu:
+2. Select **🛡️ DEEP-SHIELD** from the context menu:
    - *🔍 Scan Image (Grad-CAM & ELA Heatmap)*
    - *🎙️ Scan Voice Clone / Vocoder Artifacts*
    - *📝 Verify Claim & AI Stylometrics*
 3. The glassmorphic **Forensic HUD** instantly docks onto the media, showing the **Shield Trust Score (0-100%)**, visual heatmaps, and C2PA manifest provenance.
 
 ### Method B: Standalone Extension Popup
-1. Click the **🛡️ Deepfake Shield** icon in your browser toolbar.
+1. Click the **🛡️ DEEP-SHIELD** icon in your browser toolbar.
 2. Drag and drop any image/audio file or paste a URL/claim.
 3. Click **Analyze** to generate an immediate audit report with interactive ELA and Grad-CAM visualizations.
 

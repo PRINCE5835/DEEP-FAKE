@@ -5,8 +5,9 @@ from app.forensics.visual import analyze_image_with_heatmap
 from app.forensics.audio import analyze_audio
 from app.forensics.video import analyze_video
 from app.forensics.text_checker import verify_text_claim
+from app.forensics.reverse_image_search import reverse_image_search
 
-app = FastAPI(title="Deepfake Shield API", version="2.0.0")
+app = FastAPI(title="DEEP-SHIELD API", version="2.0.0")
 
 # CORS middleware for Web Dashboard & Chrome Extension
 app.add_middleware(
@@ -20,7 +21,7 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {
-        "service": "Deepfake Shield API",
+        "service": "DEEP-SHIELD API",
         "version": "2.0.0",
         "status": "operational",
         "endpoints": [
@@ -33,6 +34,7 @@ def read_root():
     }
 
 @app.get("/api/v1/health")
+@app.get("/api/health")
 def health_check():
     return {
         "status": "healthy",
@@ -46,6 +48,7 @@ def health_check():
     }
 
 @app.post("/api/v1/detect/image")
+@app.post("/api/analyze/image")
 async def detect_image(file: UploadFile = File(...)):
     raw_bytes = await file.read()
     if not raw_bytes or len(raw_bytes) < 100:
@@ -62,16 +65,37 @@ async def detect_image(file: UploadFile = File(...)):
                 "plain_explanation": "C2PA cryptographic manifest certifies this media was synthesized by an AI generation engine.",
                 "suspicious_regions": [],
                 "ela_score": 0.0,
-                "provenance": c2pa_res
+                "gradcam_heatmap": "",
+                "provenance": c2pa_res,
+                "reverse_image_search": {
+                    "image_hash": "",
+                    "local_matches": [],
+                    "external_matches": [],
+                    "all_matches": [],
+                    "is_known_fake": False,
+                    "best_confidence": 0.0,
+                },
             }
 
-        # 2. Universal Visual Forensics (ViT + Frequency/ELA)
+        # 2. Universal Visual Forensics (ViT + Frequency/ELA + Grad-CAM)
         visual_res = analyze_image_with_heatmap(raw_bytes)
         ai_score = visual_res["fake_probability"]
 
-        if visual_res["is_manipulated"]:
+        # 3. Reverse-image search cross-check
+        ris = await reverse_image_search(raw_bytes)
+
+        # If reverse-image search found a known fake, boost confidence
+        if ris["is_known_fake"] and ris["best_confidence"] > 0.5:
+            ai_score = max(ai_score, ris["best_confidence"])
+            is_fake = True
+        else:
+            is_fake = visual_res["is_manipulated"]
+
+        if is_fake:
             verdict = "SYNTHETIC"
             plain_text = f"AI Generation Patterns detected with {round(ai_score * 100, 1)}% confidence. Latent diffusion grid noise and synthetic texture smoothing identified."
+            if ris["is_known_fake"]:
+                plain_text += f" Reverse-image search matched {len(ris['local_matches'])} known-synthetic record(s)."
         else:
             verdict = "AUTHENTIC"
             organic_score = round((1.0 - ai_score) * 100, 1)
@@ -79,17 +103,20 @@ async def detect_image(file: UploadFile = File(...)):
 
         return {
             "verdict": verdict,
-            "confidence": ai_score if visual_res["is_manipulated"] else round(1.0 - ai_score, 4),
-            "is_manipulated": visual_res["is_manipulated"],
+            "confidence": ai_score if is_fake else round(1.0 - ai_score, 4),
+            "is_manipulated": is_fake,
             "plain_explanation": plain_text,
             "suspicious_regions": visual_res["suspicious_regions"],
             "ela_score": visual_res["ela_anomaly_score"],
-            "provenance": c2pa_res
+            "gradcam_heatmap": visual_res.get("gradcam_heatmap", ""),
+            "provenance": c2pa_res,
+            "reverse_image_search": ris,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
 
 @app.post("/api/v1/detect/audio")
+@app.post("/api/analyze/audio")
 async def detect_audio_endpoint(file: UploadFile = File(...)):
     raw_bytes = await file.read()
     if not raw_bytes:
@@ -97,6 +124,7 @@ async def detect_audio_endpoint(file: UploadFile = File(...)):
     return analyze_audio(raw_bytes)
 
 @app.post("/api/v1/detect/video")
+@app.post("/api/analyze/video")
 async def detect_video_endpoint(file: UploadFile = File(...)):
     raw_bytes = await file.read()
     if not raw_bytes:
@@ -104,15 +132,56 @@ async def detect_video_endpoint(file: UploadFile = File(...)):
     return analyze_video(raw_bytes)
 
 @app.post("/api/v1/detect/text")
+@app.post("/api/analyze/text")
 async def detect_text_endpoint(text: str = Form(...)):
-    fact_check = await verify_text_claim(text)
-    has_matches = len(fact_check.get("matches", [])) > 0
+    result = await verify_text_claim(text)
     return {
-        "verdict": "DEBUNKED" if has_matches else "UNVERIFIED",
-        "confidence": 0.95 if has_matches else 0.5,
-        "is_manipulated": has_matches,
-        "plain_explanation": f"Matched {len(fact_check['matches'])} verified fact-checking records." if has_matches else "No verified debunking records found for this statement.",
+        "verdict": result.get("verdict", "UNVERIFIED"),
+        "confidence": result.get("confidence", 0.5),
+        "is_manipulated": result.get("is_manipulated", False),
+        "plain_explanation": result.get("plain_explanation", ""),
         "suspicious_regions": [],
         "ela_score": 0.0,
-        "fact_check": fact_check
+        "fact_check": {
+            "available": result.get("fact_check_available", False),
+            "error": result.get("fact_check_error"),
+            "matches": result.get("matches", []),
+        },
+        "stylometrics": result.get("stylometrics", {}),
     }
+
+
+@app.post("/api/v1/reverse-image-search")
+async def reverse_image_search_endpoint(file: UploadFile = File(...)):
+    raw_bytes = await file.read()
+    if not raw_bytes or len(raw_bytes) < 100:
+        raise HTTPException(status_code=400, detail="Corrupted or empty image payload.")
+    return await reverse_image_search(raw_bytes)
+
+
+@app.post("/api/analyze/media")
+@app.post("/api/v1/analyze/media")
+async def analyze_media_endpoint(file: UploadFile = File(None), text: str = Form(None)):
+    """
+    Unified multimodal orchestrator with automatic type detection.
+    Accepts a file (image/audio/video) or text, routes to the correct detector.
+    """
+    if text:
+        return await verify_text_claim(text)
+
+    if file is None:
+        raise HTTPException(status_code=400, detail="No file or text provided.")
+
+    raw_bytes = await file.read()
+    content_type = file.content_type or ""
+    filename = file.filename or ""
+
+    if content_type.startswith("image/") or any(filename.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".bmp"]):
+        return await detect_image(file)
+    elif content_type.startswith("audio/") or any(filename.lower().endswith(ext) for ext in [".wav", ".mp3", ".ogg", ".m4a", ".flac"]):
+        return await detect_audio_endpoint(file)
+    elif content_type.startswith("video/") or any(filename.lower().endswith(ext) for ext in [".mp4", ".mkv", ".webm", ".avi", ".mov"]):
+        return await detect_video_endpoint(file)
+    else:
+        # Default to image detection
+        return await detect_image(file)
