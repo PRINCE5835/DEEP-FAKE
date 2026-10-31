@@ -652,7 +652,10 @@
     </main>
 
     <script>
-        const API_BASE = "/api/v1";
+        // Auto-detect API base: use relative path on Netlify (proxied via netlify.toml),
+        // use full backend URL when running locally
+        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const API_BASE = isLocal ? "http://127.0.0.1:8000/api/v1" : "/api/v1";
 
         let currentModality = 'image';
         let currentPayload = null;
