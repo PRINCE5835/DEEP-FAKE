@@ -72,6 +72,11 @@ analyzeMediaBtn.addEventListener("click", async () => {
       method: "POST",
       body: formData
     });
+    if (!res.ok) {
+      const errText = await res.text();
+      renderVerdict("ERROR", null, `Backend error HTTP ${res.status}: ${errText}`);
+      return;
+    }
     const data = await res.json();
     renderVerdict(data.verdict, data.confidence, data.plain_explanation);
   } catch (err) {
@@ -92,8 +97,13 @@ analyzeTextBtn.addEventListener("click", async () => {
       method: "POST",
       body: formData
     });
+    if (!res.ok) {
+      const errText = await res.text();
+      renderVerdict("ERROR", null, `Backend error HTTP ${res.status}: ${errText}`);
+      return;
+    }
     const data = await res.json();
-    renderVerdict(data.verdict, null, data.plain_explanation);
+    renderVerdict(data.verdict, data.confidence, data.plain_explanation);
   } catch (err) {
     renderVerdict("ERROR", null, "Failed to verify text claim.");
   }
@@ -110,7 +120,7 @@ function showLoading(msg) {
 function renderVerdict(verdict, conf, text) {
   resultBox.classList.remove("hidden");
   verdictTitle.innerText = verdict;
-  const isBad = verdict === "MANIPULATED" || verdict === "SYNTHETIC" || verdict === "DEBUNKED";
+  const isBad = verdict === "MANIPULATED" || verdict === "SYNTHETIC" || verdict === "DEBUNKED" || verdict === "SUSPECT_AI";
   verdictTitle.style.color = isBad ? "#ef4444" : "#10b981";
   verdictConfidence.innerText = conf !== null && conf !== undefined ? `${(conf * 100).toFixed(0)}%` : "";
   verdictConfidence.style.color = verdictTitle.style.color;

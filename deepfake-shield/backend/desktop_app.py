@@ -343,7 +343,7 @@ class DeepfakeShieldApp(QMainWindow):
 
     def render_claim_result(self, pane, data):
         verdict = data.get("verdict", "UNKNOWN")
-        is_bad = verdict == "DEBUNKED"
+        is_bad = verdict in ["DEBUNKED", "SUSPECT_AI"]
 
         pane.badge.setText(f"VERDICT: {verdict}")
         pane.badge.setStyleSheet(f"color: {'#ef4444' if is_bad else '#10b981'};")

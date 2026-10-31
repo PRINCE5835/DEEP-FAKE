@@ -64,8 +64,10 @@ def _detect_vocoder_cutoff(y: np.ndarray, sr: int) -> dict:
             continue
         idx = np.argmin(np.abs(freqs - tf))
         # Look at power just below vs just above the target frequency
-        below = power[max(0, idx - 10):idx].mean() if idx > 10 else 0
-        above = power[idx:idx + 10].mean() if idx + 10 < len(power) else 0
+        below_slice = power[max(0, idx - 10):idx]
+        above_slice = power[idx:idx + 10]
+        below = float(below_slice.mean()) if len(below_slice) > 0 else 0.0
+        above = float(above_slice.mean()) if len(above_slice) > 0 else 0.0
         # A sharp cutoff: high power below, near-zero above
         if below > 0:
             ratio = above / (below + 1e-10)

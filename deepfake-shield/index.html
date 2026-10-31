@@ -786,7 +786,7 @@
             card.classList.remove('hidden', 'danger', 'success');
             metrics.classList.remove('hidden');
 
-            const isBad = data.verdict === 'MANIPULATED' || data.verdict === 'SYNTHETIC' || data.verdict === 'DEBUNKED';
+            const isBad = data.verdict === 'MANIPULATED' || data.verdict === 'SYNTHETIC' || data.verdict === 'DEBUNKED' || data.verdict === 'SUSPECT_AI';
             card.classList.add(isBad ? 'danger' : 'success');
             title.className = `verdict-title font-serif ${isBad ? 'danger' : 'success'}`;
             title.innerText = data.verdict;

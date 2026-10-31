@@ -9,7 +9,6 @@ Optional external lookup (SerpAPI / Google Lens) can be enabled via
 REVERSE_IMAGE_SEARCH_API_KEY in backend/.env.
 """
 
-import asyncio
 import io
 import json
 import os

@@ -169,14 +169,34 @@ async def analyze_media_endpoint(file: UploadFile = File(None), text: str = Form
     Accepts a file (image/audio/video) or text, routes to the correct detector.
     """
     if text:
-        return await verify_text_claim(text)
+        result = await verify_text_claim(text)
+        return {
+            "verdict": result.get("verdict", "UNVERIFIED"),
+            "confidence": result.get("confidence", 0.5),
+            "is_manipulated": result.get("is_manipulated", False),
+            "plain_explanation": result.get("plain_explanation", ""),
+            "suspicious_regions": [],
+            "ela_score": 0.0,
+            "fact_check": {
+                "available": result.get("fact_check_available", False),
+                "error": result.get("fact_check_error"),
+                "matches": result.get("matches", []),
+            },
+            "stylometrics": result.get("stylometrics", {}),
+        }
 
     if file is None:
         raise HTTPException(status_code=400, detail="No file or text provided.")
 
     raw_bytes = await file.read()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Empty file payload.")
+
     content_type = file.content_type or ""
     filename = file.filename or ""
+
+    # Rewind file pointer so detector functions can read it again
+    await file.seek(0)
 
     if content_type.startswith("image/") or any(filename.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".bmp"]):
         return await detect_image(file)

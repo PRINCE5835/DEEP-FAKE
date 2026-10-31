@@ -219,10 +219,10 @@ def _extract_suspicious_regions_from_heatmap(heatmap_np: np.ndarray, orig_h: int
         # box_2d format: [y1, x1, y2, x2] normalized 0..1 (consistent with existing code)
         regions.append({
             "box_2d": [
-                round(y / orig_h, 4),
-                round(x / orig_w, 4),
-                round((y + h) / orig_h, 4),
-                round((x + w) / orig_w, 4),
+                int(y),
+                int(x),
+                int(y + h),
+                int(x + w),
             ],
             "label": f"Grad-CAM activation ({round(float(norm[labels == i].max()), 2)})",
             "score": round(float(norm[labels == i].max()), 2),
@@ -287,8 +287,8 @@ def analyze_image_with_heatmap(image_bytes: bytes) -> dict:
     # Fallback if Grad-CAM produced nothing but we still want a region
     if is_fake and not suspicious_regions:
         suspicious_regions.append({
-            "box_2d": [round(orig_h * 0.15, 4), round(orig_w * 0.15, 4),
-                       round(orig_h * 0.85, 4), round(orig_w * 0.85, 4)],
+            "box_2d": [int(orig_h * 0.15), int(orig_w * 0.15),
+                       int(orig_h * 0.85), int(orig_w * 0.85)],
             "label": f"AI Latent Diffusion Artifacts ({round(ai_score * 100, 1)}%)",
             "score": round(ai_score, 2),
         })

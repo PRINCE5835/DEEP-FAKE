@@ -27,6 +27,13 @@ except ImportError:
     analyze_audio_forensics = None  # type: ignore
 
 try:
+    from .video import analyze_video
+    analyze_video_forensics = analyze_video
+except ImportError:
+    analyze_video = None  # type: ignore
+    analyze_video_forensics = None  # type: ignore
+
+try:
     from .text_checker import verify_text_claim
     analyze_text_forensics = verify_text_claim
 except ImportError:
@@ -47,6 +54,8 @@ __all__ = [
     "analyze_visual_forensics",
     "analyze_audio",
     "analyze_audio_forensics",
+    "analyze_video",
+    "analyze_video_forensics",
     "verify_text_claim",
     "analyze_text_forensics",
     "reverse_image_search",
