@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEEP-SHIELD — Forensic Verification Workbench</title>
+    <title>Aletheia Shield — Forensic Verification Workbench</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -526,8 +526,8 @@
         <div class="header-content">
             <div>
                 <div class="brand-title font-serif">
-                    <div class="brand-seal">D</div>
-                    DEEP-SHIELD
+                    <div class="brand-seal">A</div>
+                    Aletheia Shield
                 </div>
                 <div class="brand-subtitle">Automated Multi-Modal Integrity & Forensics Workbench</div>
             </div>
@@ -545,7 +545,6 @@
             <div class="preset-buttons">
                 <button class="btn-preset" onclick="loadSyntheticFacePreset()">🎭 AI Face-Swap Image</button>
                 <button class="btn-preset" onclick="loadAuthenticPreset()">📷 Camera Photograph</button>
-                <button class="btn-preset" onclick="loadDeepfakeVideoPreset()">🎥 AI Deepfake Video</button>
                 <button class="btn-preset" onclick="loadAudioPreset()">🎙️ ElevenLabs Voice Clone</button>
                 <button class="btn-preset" onclick="loadViralClaimPreset()">📰 Disinformation Claim</button>
             </div>
@@ -608,7 +607,6 @@
 
                     <div class="canvas-container">
                         <img id="preview-image" src="" alt="Forensic Target" class="hidden">
-                        <video id="preview-video" src="" alt="Forensic Target" class="hidden"></video>
                         <canvas id="overlay-canvas"></canvas>
                         <div id="placeholder-text" style="color: #64748b; font-size: 13px;">No media loaded for analysis
                         </div>
@@ -672,15 +670,10 @@
             const dropIcon = document.getElementById('drop-icon');
             const dropText = document.getElementById('drop-text');
             const dropHint = document.getElementById('drop-hint');
-            const previewImage = document.getElementById('preview-image');
-            const previewVideo = document.getElementById('preview-video');
 
             if (modality === 'text') {
                 mediaView.classList.add('hidden');
                 textView.classList.remove('hidden');
-                previewImage.classList.add('hidden');
-                previewVideo.classList.add('hidden');
-                previewVideo.src = "";
             } else {
                 mediaView.classList.remove('hidden');
                 textView.classList.add('hidden');
@@ -689,24 +682,16 @@
                     dropText.innerText = 'Select or drag image payload';
                     dropHint.innerText = 'PNG, JPG, WEBP';
                     document.getElementById('file-selector').accept = 'image/*';
-                    previewImage.classList.remove('hidden');
-                    previewVideo.classList.add('hidden');
-                    previewVideo.src = "";
                 } else if (modality === 'video') {
                     dropIcon.innerText = '🎥';
                     dropText.innerText = 'Select or drag MP4 video clip';
                     dropHint.innerText = 'H.264 / MP4 up to 50MB';
                     document.getElementById('file-selector').accept = 'video/mp4';
-                    previewImage.classList.add('hidden');
-                    previewVideo.classList.remove('hidden');
                 } else if (modality === 'audio') {
                     dropIcon.innerText = '🎙️';
                     dropText.innerText = 'Select or drag voice note / track';
                     dropHint.innerText = 'WAV, MP3, OGG (16kHz recommended)';
                     document.getElementById('file-selector').accept = 'audio/*';
-                    previewImage.classList.add('hidden');
-                    previewVideo.classList.add('hidden');
-                    previewVideo.src = "";
                 }
             }
         }
@@ -726,14 +711,6 @@
                     img.onload = () => renderCanvas();
                 };
                 reader.readAsDataURL(currentPayload);
-            } else if (currentModality === 'video' || currentModality === 'audio') {
-                const url = URL.createObjectURL(currentPayload);
-                if (currentModality === 'video') {
-                    const vid = document.getElementById('preview-video');
-                    vid.src = url;
-                    vid.classList.remove('hidden');
-                    document.getElementById('placeholder-text').classList.add('hidden');
-                }
             }
         }
 
@@ -878,11 +855,8 @@
         function loadSyntheticFacePreset() {
             switchTab('image');
             const img = document.getElementById('preview-image');
-            const vid = document.getElementById('preview-video');
             img.src = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80";
             img.classList.remove('hidden');
-            vid.classList.add('hidden');
-            vid.src = "";
             document.getElementById('placeholder-text').classList.add('hidden');
             document.getElementById('file-details').innerText = "Loaded: synth_face_sample.jpg (Preset)";
 
@@ -903,11 +877,8 @@
         function loadAuthenticPreset() {
             switchTab('image');
             const img = document.getElementById('preview-image');
-            const vid = document.getElementById('preview-video');
             img.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80";
             img.classList.remove('hidden');
-            vid.classList.add('hidden');
-            vid.src = "";
             document.getElementById('placeholder-text').classList.add('hidden');
             document.getElementById('file-details').innerText = "Loaded: dslr_portrait_uncompressed.jpg (Preset)";
 
@@ -921,38 +892,8 @@
             });
         }
 
-        function loadDeepfakeVideoPreset() {
-            switchTab('video');
-            const img = document.getElementById('preview-image');
-            const vid = document.getElementById('preview-video');
-            img.classList.add('hidden');
-            vid.classList.remove('hidden');
-            document.getElementById('placeholder-text').classList.add('hidden');
-            document.getElementById('file-details').innerText = "Loaded: deepfake_video_sample.mp4 (Preset)";
-
-            displayResults({
-                verdict: "SYNTHETIC",
-                confidence: 0.917,
-                plain_explanation: "Video indicates temporal facial tampering. Avg frame manipulation: 88.4%, temporal anomaly: 76.2%. Blink rate anomaly detected (eyes unnaturally static). Optical flow inconsistency at mouth boundary suggests lip-sync manipulation.",
-                suspicious_regions: [],
-                ela_score: 0.0,
-                analyzed_frames: 120,
-                suspicious_timestamps: [3.2, 7.8, 12.1, 18.5],
-                avg_frame_fake_score: 0.82,
-                temporal_anomaly_score: 0.76,
-                blink_anomaly: 0.89,
-                flow_anomaly: 0.63,
-                temporal_consistent: false
-            });
-        }
-
         function loadAudioPreset() {
             switchTab('audio');
-            const vid = document.getElementById('preview-video');
-            const img = document.getElementById('preview-image');
-            img.classList.add('hidden');
-            vid.classList.add('hidden');
-            vid.src = "";
             document.getElementById('file-details').innerText = "Loaded: elevenlabs_cloned_voice.wav (Preset)";
             displayResults({
                 verdict: "SYNTHETIC",
