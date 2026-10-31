@@ -4,12 +4,12 @@
 
 [[redirects]]
   source = "/api/v1/:splat"
-  dest = "https://deepfake-shield-backend.onrender.com/api/v1/:splat"
+  dest = "https://deep-fake-2-de8a.onrender.com/api/v1/:splat"
   status = 200
 
 [[redirects]]
   source = "/api/:splat"
-  dest = "https://deepfake-shield-backend.onrender.com/api/:splat"
+  dest = "https://deep-fake-2-de8a.onrender.com/api/:splat"
   status = 200
 
 [[redirects]]

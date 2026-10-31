@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "https://deepfake-shield-backend.onrender.com/api/v1/:path*"
+      "destination": "https://deep-fake-2-de8a.onrender.com/api/v1/:path*"
     },
     {
       "source": "/api/:path*",
-      "destination": "https://deepfake-shield-backend.onrender.com/api/:path*"
+      "destination": "https://deep-fake-2-de8a.onrender.com/api/:path*"
     }
   ]
 }
