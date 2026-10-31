@@ -1,6 +1,6 @@
 [build]
   base = "deepfake-shield"
-  publish = "deepfake-shield"
+  publish = "."
 
 [[redirects]]
   source = "/api/v1/:splat"
